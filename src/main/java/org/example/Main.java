@@ -1,16 +1,17 @@
 package org.example;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import io.github.cdimascio.dotenv.Dotenv;
+import java.sql.*;
 
 public class Main {
     public static void main(String[] args) {
-        String url = "jdbc:postgresql://localhost:5432/users_story";
-        String username = "postgres";
-        String password = "Arnel012*/";
+        // Charger le fichier .env
+        Dotenv dotenv = Dotenv.load();
+
+        // Récupérer les variables
+        String url = dotenv.get("DB_URL");
+        String username = dotenv.get("DB_USER");
+        String password = dotenv.get("DB_PASSWORD");
 
         String query = "SELECT id, username, email FROM users";
 
@@ -18,17 +19,13 @@ public class Main {
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
 
-            System.out.println("Liste des utilisateurs :");
+            System.out.println("Connexion réussie via .env !");
             while (rs.next()) {
-                int id = rs.getInt("id");
-                String name = rs.getString("username");
-                String email = rs.getString("email");
-
-                System.out.printf("ID: %d | Nom: %s | Email: %s%n", id, name, email);
+                System.out.printf("ID: %d | Nom: %s%n", rs.getInt("id"), rs.getString("username"));
             }
 
         } catch (SQLException e) {
-            throw new RuntimeException("Erreur fatale lors de l'accès à la base de données", e);
+            throw new RuntimeException("Erreur de base de données", e);
         }
     }
 }
